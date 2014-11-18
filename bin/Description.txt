@@ -5,9 +5,26 @@ Description:
     
     It is about a grocery list stored in an online database (Heroku) that any user can access. - Simple!
 
+
+Host
+ec2-54-83-204-78.compute-1.amazonaws.com
+Database
+d9m29grjp2sn7g
+User
+vnhritlmzcvejp
+Port
+5432
+Password
+hzcnlIpsaofuwCu8mdDISfbhQs
+Psql
+heroku pg:psql --app heroku-postgres-6659b073 HEROKU_POSTGRESQL_BLUE
+URL
+postgres://vnhritlmzcvejp:hzcnlIpsaofuwCu8mdDISfbhQs@ec2-54-83-204-78.compute-1.amazonaws.com:5432/d9m29grjp2sn7g
+
+
 ---TO DO---
 
-1. Merge OCSF w/ files generated from Umple
+1. Merge OCSF w/ files generated from Umple [x]
 2. Create Heroku Database
 3. Connect database to server
 4. Connect clients to server

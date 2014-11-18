@@ -13,6 +13,13 @@
 
 import ocsf.server.*;
 import common.*;
+
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * This class overrides some of the methods in the abstract 
  * superclass in order to give more functionality to the server.
@@ -32,6 +39,7 @@ public class EchoServer extends AbstractServer
 	 */
 	final public static int DEFAULT_PORT = 5555;
 	ChatIF serverUI;
+	static Connection database;
 
 	//Constructors ****************************************************
 
@@ -52,6 +60,20 @@ public class EchoServer extends AbstractServer
 	public EchoServer(int port, ChatIF serverUI){
 		super(port);
 		this.serverUI = serverUI;
+//		try {
+//			Class.forName("org.postgresql.Driver");
+//		} catch (ClassNotFoundException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+		
+		try {
+			getConnection();
+			System.out.println("Succesfully connected to the database.");
+		} catch (URISyntaxException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
@@ -171,6 +193,16 @@ public class EchoServer extends AbstractServer
 		System.out.println(client.getInfo("loginID") + " has disconnected.");
 		sendToAllClients(client.getInfo("loginID") + " has disconnected.");
 	}
+	
+	private static Connection getConnection() throws URISyntaxException, SQLException {
+	    //URI dbUri = new URI(System.getenv("DATABASE_URL"));
+		
+	    String username = "vnhritlmzcvejp";
+	    String password = "hzcnlIpsaofuwCu8mdDISfbhQs";
+	    String dbUrl = "jdbc:postgresql://ec2-54-83-204-78.compute-1.amazonaws.com:5432/d9m29grjp2sn7g?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+	    database = DriverManager.getConnection(dbUrl, username, password);
+	    return DriverManager.getConnection(dbUrl, username, password);
+	} 
 
 	//Class methods ***************************************************
 
@@ -184,7 +216,7 @@ public class EchoServer extends AbstractServer
 	public static void main(String[] args) 
 	{
 		int port = 0; //Port to listen on
-
+		
 		try
 		{
 			port = Integer.parseInt(args[0]); //Get port from command line
