@@ -1,0 +1,20 @@
+---Project Grocery---
+
+Description:
+    This is a project done in class SEG 2105 at the University of Ottawa.
+    
+    It is about a grocery list stored in an online database (Heroku) that any user can access. - Simple!
+
+---TO DO---
+
+1. Merge OCSF w/ files generated from Umple
+2. Create Heroku Database
+3. Connect database to server
+4. Connect clients to server
+5. Create the clients' utilities (add/edit/remove/etc.)
+6. Make server responsive to clients' requests
+7. Test in command line
+8. Make GUI
+
+Umple code: https://docs.google.com/document/d/1gvPXB5T7gL_4ZkLZ5LrRn3PvBTJw5I0h1bCUbGEmZd4/edit?usp=sharing
+
