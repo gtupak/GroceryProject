@@ -3,23 +3,31 @@
 // license found at www.lloseng.com 
 
 /**Assignment 3 - Lab 2
-*
-* Name: Gabriel Tapuc
-* Student #: 7269083
-* 
-* Name: Christine Kandalaft
-* Student #: 7216942
-*/
+ *
+ * Name: Gabriel Tapuc
+ * Student #: 7269083
+ * 
+ * Name: Christine Kandalaft
+ * Student #: 7216942
+ */
 
 import ocsf.server.*;
 import common.*;
 
 import java.sql.DriverManager;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  * This class overrides some of the methods in the abstract 
  * superclass in order to give more functionality to the server.
@@ -60,18 +68,20 @@ public class EchoServer extends AbstractServer
 	public EchoServer(int port, ChatIF serverUI){
 		super(port);
 		this.serverUI = serverUI;
-//		try {
-//			Class.forName("org.postgresql.Driver");
-//		} catch (ClassNotFoundException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		
+		// Set up properties file
+		Properties props = new Properties();
+		FileInputStream in = null;
+
 		try {
-			getConnection();
-			System.out.println("Succesfully connected to the database.");
-		} catch (URISyntaxException | SQLException e) {
-			// TODO Auto-generated catch block
+			// Load properties and send it to getConnection()
+			in = new FileInputStream("database.properties");
+			props.load(in);
+			getConnection(props);
+
+
+		} catch (URISyntaxException | SQLException | IOException e) {
+			Logger lgr = Logger.getLogger(EchoServer.class.getName());
+			lgr.log(Level.WARNING, e.getMessage(), e);
 			e.printStackTrace();
 		}
 	}
@@ -91,12 +101,43 @@ public class EchoServer extends AbstractServer
 		// **** Changed for E51
 		try{
 			if (client.getInfo("isLoggedIn").equals(true) && msg != null){
+				if (msg.toString().length() >= 4){
+					if (msg.toString().substring(0, 4).toUpperCase().equals("#SQL")){
+						// Extract SQL command from message string
+						String stm = msg.toString().substring(5, msg.toString().length());
+						
+						// Initialize SQL statement
+						try {
+							ResultSet rs = null;
+							System.out.println("---> SQL command to be executed: " + stm);
+							PreparedStatement pst = database.prepareStatement(stm);
+							pst.executeUpdate();
+							
+							pst = database.prepareStatement("SELECT * FROM entries");
+							rs = pst.executeQuery();
+							
+							while(rs.next()){
+								String toSend = "ID: " + rs.getInt(1) 
+										+ " Description :" + rs.getString(2)
+										+ " Creator: " + rs.getString(3)
+										+ " Checker: " + rs.getString(4)
+										+ " Checked: " +rs.getBoolean(5);
+								client.sendToClient(toSend);
+							}
+							
+						} catch (SQLException e) {
+							Logger lgr = Logger.getLogger(EchoServer.class.getName());
+				            lgr.log(Level.SEVERE, e.getMessage(), e);
+						}
+					}
+				}
 				if (msg.toString().length() >= 6){
 					if (msg.toString().substring(0, 6).equals("#login")){
 						client.sendToClient("SERVER> You are already logged in.");
 						return;
 					}
-					else {
+					else 
+					{
 						System.out.println("Message received: " + msg + " from " + client.getInfo("loginID"));
 						this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
 					}
@@ -108,7 +149,7 @@ public class EchoServer extends AbstractServer
 			}
 
 		}
-		catch (Exception e){ // Only if it's the first time that the clients connects
+		catch (Exception e){ // Occurs only if it's the first time that the clients connect
 			try {
 				if (msg.toString().substring(0, 6).equals("#login")){
 					System.out.println("Message received " + msg + " from " + client.getInetAddress());
@@ -132,26 +173,6 @@ public class EchoServer extends AbstractServer
 			}
 		}
 	}
-	//		if (msg.toString().length() >= 6){
-	//			if (msg.toString().substring(0, 6).equals("#login")){
-	//				try{//There will only be an exception caught when the user first logs in
-	//					if (client.getInfo("isLoggedIn").equals(true)){
-	//						client.sendToClient("SERVER> You are already logged in.");
-	//						return;
-	//					}
-	//				}
-	//				catch (Exception e){
-	//					client.setInfo("loginID", msg.toString().substring(7, msg.toString().length()));
-	//					client.setInfo("isLoggedIn", true);
-	//					return;
-	//				}
-	//			}
-	//		}
-	//		if (msg != null){
-	//			System.out.println("Message received: " + msg + " from " + client);
-	//			this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
-	//		}
-	//	}
 
 	/**
 	 * **** Changed for E50
@@ -189,19 +210,27 @@ public class EchoServer extends AbstractServer
 
 	// **** Changed for E49
 	synchronized protected void clientException(
-		    ConnectionToClient client, Throwable exception) {
+			ConnectionToClient client, Throwable exception) {
 		System.out.println(client.getInfo("loginID") + " has disconnected.");
 		sendToAllClients(client.getInfo("loginID") + " has disconnected.");
 	}
-	
-	private static Connection getConnection() throws URISyntaxException, SQLException {
-	    //URI dbUri = new URI(System.getenv("DATABASE_URL"));
-		
-	    String username = "vnhritlmzcvejp";
-	    String password = "hzcnlIpsaofuwCu8mdDISfbhQs";
-	    String dbUrl = "jdbc:postgresql://ec2-54-83-204-78.compute-1.amazonaws.com:5432/d9m29grjp2sn7g?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-	    database = DriverManager.getConnection(dbUrl, username, password);
-	    return DriverManager.getConnection(dbUrl, username, password);
+
+	/**
+	 * Method used to connect to the database, based on the informations in the
+	 * database.properties file.
+	 * 
+	 * @param props Properties parameter, that contains info about the database
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws SQLException
+	 */
+	private static boolean getConnection(Properties props) throws URISyntaxException, SQLException {
+		//URI dbUri = new URI(System.getenv("DATABASE_URL"));
+		String url = props.getProperty("db.url");
+		String user = props.getProperty("db.user");
+		String passwd = props.getProperty("db.passwd");
+		database = DriverManager.getConnection(url, user, passwd);
+		return (database != null);
 	} 
 
 	//Class methods ***************************************************
@@ -216,7 +245,7 @@ public class EchoServer extends AbstractServer
 	public static void main(String[] args) 
 	{
 		int port = 0; //Port to listen on
-		
+
 		try
 		{
 			port = Integer.parseInt(args[0]); //Get port from command line
