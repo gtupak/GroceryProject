@@ -29,7 +29,7 @@ import common.*;
 public class ClientConsole implements ChatIF 
 {
 	//Class variables *************************************************
-
+	
 	/**
 	 * The default port to connect on.
 	 */
@@ -40,7 +40,7 @@ public class ClientConsole implements ChatIF
 	/**
 	 * The instance of the client that created this ConsoleChat.
 	 */
-	ChatClient client;
+	static ChatClient client;
 
 
 	//Constructors ****************************************************
@@ -74,10 +74,8 @@ public class ClientConsole implements ChatIF
 	 */
 	public void accept() 
 	{
-
 		try
 		{
-
 			BufferedReader fromConsole = 
 					new BufferedReader(new InputStreamReader(System.in));
 			String message;
@@ -148,7 +146,10 @@ public class ClientConsole implements ChatIF
 		System.out.println(message);
 	}
 
-
+	public static void receiveGUICommand(String cmd){
+		client.handleMessageFromClientUI(cmd);
+	}
+	
 	//Class methods ***************************************************
 
 	/**
@@ -156,7 +157,7 @@ public class ClientConsole implements ChatIF
 	 *
 	 * @param args[0] The host to connect to.
 	 */
-	public static void main(String[] args) 
+ 	public static void main(String[] args) 
 	{
 		String host = "";
 		String login = "";
@@ -179,7 +180,7 @@ public class ClientConsole implements ChatIF
 				host = "localhost";
 			}
 		}
-
+		ClientGUI.main(args);
 		ClientConsole chat= new ClientConsole(host, port, login);
 		System.out.println("> Cannot open connection. Awaiting command.");
 		chat.accept();  //Wait for console data
