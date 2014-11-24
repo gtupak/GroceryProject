@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 
 import common.Entry;
 
@@ -24,9 +25,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Color;
+
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.ListModel;
 
 public class ClientGUI  {
 
@@ -36,7 +39,10 @@ public class ClientGUI  {
 	private static ArrayList<Entry> arrayList = new ArrayList<Entry>();
 	private static DefaultListModel listModel = new DefaultListModel();
 	private static ArrayList<Integer> uniqueID = new ArrayList<Integer>();
-	CheckListManager checkListManager;
+	private static JLabel creatorName = new JLabel("");
+	private static JLabel checkerName = new JLabel("");
+	private static CheckListManager checkListManager;
+	private static ListSelectionModel selModel;
 	
 	/**
 	 * Launch the application.
@@ -66,41 +72,62 @@ public class ClientGUI  {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 458, 510);
+		frame.setBounds(100, 100, 458, 397);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 41, 426, 132);
+		scrollPane.setBounds(12, 41, 426, 193);
 		frame.getContentPane().add(scrollPane);
 
 		uncheckedList = new JList(listModel);
-		CheckListManager checkListManager = new CheckListManager(uncheckedList);
+		CheckListManager checkListManager = new CheckListManager(uncheckedList){
+			@Override
+			public void mouseClicked(MouseEvent me){ 
+				int index = uncheckedList.locationToIndex(me.getPoint()); 
+				if(index<0) 
+					return; 
+				if(me.getX()>uncheckedList.getCellBounds(index, index).x+hotspot) 
+					return; 
+				toggleSelection(index);
+				
+				// Update entry as "checked" in the database
+				Entry en = arrayList.get(uncheckedList.getSelectedIndex());
+				int id = en.getId();
+				String checker = (!en.isChecked()) ? ClientConsole.client.getLogin() : "";
+				String cmd = "#sql UPDATE entries SET checked=" + !en.isChecked() + ", checker='"
+						+ checker + "' WHERE id=" + id;
+				ClientConsole.receiveGUICommand(cmd);
+			} 
+		};
 		
 		uncheckedList.setBackground(new Color(255, 255, 204));
 		uncheckedList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				System.out.println("Mouse clicked on entry nr. " + arrayList.get(uncheckedList.getSelectedIndex()).getId());
+				System.out.println("Mouse clicked on " + arrayList.get(uncheckedList.getSelectedIndex()));
+				creatorName.setText(arrayList.get(uncheckedList.getSelectedIndex()).getCreator());
+				checkerName.setText(arrayList.get(uncheckedList.getSelectedIndex()).getChecker());
 			}
 		});
-
+		
 		scrollPane.setViewportView(uncheckedList);
-
+		
+		selModel = checkListManager.getSelectionModel();
+		
 		input = new JTextField();
-		input.setBounds(12, 254, 282, 34);
+		input.setBounds(12, 311, 282, 34);
 		frame.getContentPane().add(input);
 		input.setColumns(10);
 
 		JButton btnAddEntry = new JButton("Add Entry");
 		btnAddEntry.setBackground(new Color(204, 255, 153));
-		
 		// When Add Entry button is clicked: send #sql command with unique ID
 		btnAddEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Clear the list first
 				listModel.clear();
-
+				
 				// Find uniqueID
 				int id = 0;
 					for (int i = 0; i < uniqueID.size(); i++){
@@ -119,7 +146,7 @@ public class ClientGUI  {
 				ClientConsole.receiveGUICommand(cmd);
 			}
 		});
-		btnAddEntry.setBounds(321, 258, 117, 25);
+		btnAddEntry.setBounds(321, 315, 117, 25);
 		frame.getContentPane().add(btnAddEntry);
 
 		JLabel lblMyGroceryList = new JLabel("My Grocery List");
@@ -127,25 +154,41 @@ public class ClientGUI  {
 		frame.getContentPane().add(lblMyGroceryList);
 		
 		JLabel lblCreator = new JLabel("Creator:");
-		lblCreator.setBounds(22, 185, 75, 25);
+		lblCreator.setBounds(23, 246, 75, 25);
 		frame.getContentPane().add(lblCreator);
 		
-		JLabel creatorName = new JLabel("");
-		creatorName.setBounds(100, 185, 75, 25);
+		creatorName.setBounds(91, 246, 75, 25);
 		frame.getContentPane().add(creatorName);
 		
 		JButton btnRemoveEntry = new JButton("Remove Entry");
+		btnRemoveEntry.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {				
+				// Get clicked ID
+				int id = arrayList.get(uncheckedList.getSelectedIndex()).getId();
+				
+				// Create SQL string
+				String cmd = "#SQL DELETE FROM entries WHERE id=" + id;
+				
+				// Delete id from uniqueID list
+				for (int i = 0; i < uniqueID.size(); i++){
+					if (uniqueID.get(i) == id){
+						uniqueID.remove(i);
+						break;
+					}
+				}
+				ClientConsole.receiveGUICommand(cmd);
+			}
+		});
 		btnRemoveEntry.setBackground(new Color(255, 153, 102));
-		btnRemoveEntry.setBounds(308, 185, 130, 25);
+		btnRemoveEntry.setBounds(308, 246, 130, 25);
 		frame.getContentPane().add(btnRemoveEntry);
 		
-		JCheckBox chckbxNewCheckBox = new JCheckBox("");
-		chckbxNewCheckBox.setBounds(128, 189, 129, 23);
-		frame.getContentPane().add(chckbxNewCheckBox);
+		JLabel lblChecker = new JLabel("Checked by:");
+		lblChecker.setBounds(12, 279, 86, 15);
+		frame.getContentPane().add(lblChecker);
 		
-		JCheckBoxMenuItem chckbxmntmNewCheckItem = new JCheckBoxMenuItem("New check item");
-		chckbxmntmNewCheckItem.setBounds(49, 321, 282, 111);
-		frame.getContentPane().add(chckbxmntmNewCheckItem);
+		checkerName.setBounds(121, 274, 75, 25);
+		frame.getContentPane().add(checkerName);
 	}
 
 	/**
@@ -160,13 +203,18 @@ public class ClientGUI  {
 		Iterator<Entry> it = list.iterator();
 		uniqueID = new ArrayList<Integer>();
 		Entry en;
+		int i = 0;
 		while (it.hasNext()){
 			en = it.next();
-			uniqueID.add(en.getId());
+			uniqueID.add(i, en.getId());
 			arrayList.add(en);
+			i++;
 		}
-		for (int i = 0; i<arrayList.size(); i++){
-			listModel.add(i, arrayList.get(i).getDescription());
+		for (int ind = 0; ind<arrayList.size(); ind++){
+			listModel.add(ind, arrayList.get(ind).getDescription());
+			if (arrayList.get(ind).isChecked()){
+				selModel.addSelectionInterval(ind, ind);
+			}
 		}
 	}
 }

@@ -117,20 +117,11 @@ public class EchoServer extends AbstractServer
 							pst = database.prepareStatement("SELECT * FROM entries");
 							rs = pst.executeQuery();
 							
-//							while(rs.next()){
-//								String toSend = "ID: " + rs.getInt(1) 
-//										+ " Description :" + rs.getString(2)
-//										+ " Creator: " + rs.getString(3)
-//										+ " Checker: " + rs.getString(4)
-//										+ " Checked: " +rs.getBoolean(5);
-//								client.sendToClient(toSend);
-//							}
 							ArrayList<Entry> entries = new ArrayList<Entry>();
 							while (rs.next()){
 								entries.add(new Entry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
 							}
-							client.sendToClient(entries);
-//							client.sendToClient(msg);
+							this.sendToAllClients(entries);
 							
 						} catch (SQLException e) {
 							Logger lgr = Logger.getLogger(EchoServer.class.getName());

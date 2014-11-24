@@ -59,5 +59,8 @@ public class Entry implements Serializable {
 		return id;
 	}
 	
-	
+	public String toString(){
+		return "ID: " + id + "; Description: " + description + "; Creator: " + creator + "; Checker: "
+				+ checker + "; Checked: " + checked;
+	}
 }
