@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import common.ChatIF;
+import common.Entry;
 
 /**Assignment 3 - Lab 2
 *
@@ -120,6 +122,16 @@ public class ServerConsole implements ChatIF {
 		}
 		ServerConsole console = new ServerConsole(port);
 		console.accept();
+	}
+	
+	
+	/**
+	 * Currently not used.
+	 */
+	@Override
+	public void displayGUI(ArrayList<Entry> msg) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

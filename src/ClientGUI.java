@@ -23,15 +23,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Color;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
+import javax.swing.JCheckBoxMenuItem;
 
 public class ClientGUI  {
 
 	private JFrame frame;
 	private JTextField input;
-	private JList uncheckedList;
+	private static JList uncheckedList;
 	private static ArrayList<Entry> arrayList = new ArrayList<Entry>();
 	private static DefaultListModel listModel = new DefaultListModel();
 	private static ArrayList<Integer> uniqueID = new ArrayList<Integer>();
+	CheckListManager checkListManager;
 	
 	/**
 	 * Launch the application.
@@ -61,7 +66,7 @@ public class ClientGUI  {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 458, 341);
+		frame.setBounds(100, 100, 458, 510);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
@@ -70,6 +75,9 @@ public class ClientGUI  {
 		frame.getContentPane().add(scrollPane);
 
 		uncheckedList = new JList(listModel);
+		CheckListManager checkListManager = new CheckListManager(uncheckedList);
+		
+		uncheckedList.setBackground(new Color(255, 255, 204));
 		uncheckedList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -85,6 +93,7 @@ public class ClientGUI  {
 		input.setColumns(10);
 
 		JButton btnAddEntry = new JButton("Add Entry");
+		btnAddEntry.setBackground(new Color(204, 255, 153));
 		
 		// When Add Entry button is clicked: send #sql command with unique ID
 		btnAddEntry.addActionListener(new ActionListener() {
@@ -116,6 +125,27 @@ public class ClientGUI  {
 		JLabel lblMyGroceryList = new JLabel("My Grocery List");
 		lblMyGroceryList.setBounds(165, 0, 129, 29);
 		frame.getContentPane().add(lblMyGroceryList);
+		
+		JLabel lblCreator = new JLabel("Creator:");
+		lblCreator.setBounds(22, 185, 75, 25);
+		frame.getContentPane().add(lblCreator);
+		
+		JLabel creatorName = new JLabel("");
+		creatorName.setBounds(100, 185, 75, 25);
+		frame.getContentPane().add(creatorName);
+		
+		JButton btnRemoveEntry = new JButton("Remove Entry");
+		btnRemoveEntry.setBackground(new Color(255, 153, 102));
+		btnRemoveEntry.setBounds(308, 185, 130, 25);
+		frame.getContentPane().add(btnRemoveEntry);
+		
+		JCheckBox chckbxNewCheckBox = new JCheckBox("");
+		chckbxNewCheckBox.setBounds(128, 189, 129, 23);
+		frame.getContentPane().add(chckbxNewCheckBox);
+		
+		JCheckBoxMenuItem chckbxmntmNewCheckItem = new JCheckBoxMenuItem("New check item");
+		chckbxmntmNewCheckItem.setBounds(49, 321, 282, 111);
+		frame.getContentPane().add(chckbxmntmNewCheckItem);
 	}
 
 	/**
