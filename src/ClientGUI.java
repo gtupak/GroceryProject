@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -30,10 +31,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.ListModel;
+import javax.swing.border.BevelBorder;
 
 public class ClientGUI  {
 
-	protected JFrame frame;
+	protected JFrame frmMyGroceryList;
 	private JTextField input;
 	private static JList groceryList;
 	private static ArrayList<Entry> arrayList = new ArrayList<Entry>();
@@ -52,7 +54,7 @@ public class ClientGUI  {
 			public void run() {
 				try {
 					ClientGUI window = new ClientGUI();
-					window.frame.setVisible(true);
+					window.frmMyGroceryList.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -71,14 +73,15 @@ public class ClientGUI  {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 458, 397);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmMyGroceryList = new JFrame();
+		frmMyGroceryList.setTitle("My Grocery List (Made by G.T. and C.K.)");
+		frmMyGroceryList.setBounds(100, 100, 458, 397);
+		frmMyGroceryList.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmMyGroceryList.getContentPane().setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 41, 426, 193);
-		frame.getContentPane().add(scrollPane);
+		frmMyGroceryList.getContentPane().add(scrollPane);
 
 		groceryList = new JList(listModel);
 		CheckListManager checkListManager = new CheckListManager(groceryList){
@@ -105,6 +108,14 @@ public class ClientGUI  {
 		groceryList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() >= 2){
+					String updatedEntry = JOptionPane.showInputDialog(new JFrame(),"Edit entry", 
+							arrayList.get(groceryList.getSelectedIndex()).getDescription());
+					String cmd = "#sql UPDATE entries SET entry='" + updatedEntry + "' WHERE id="
+							+ arrayList.get(groceryList.getSelectedIndex()).getId();
+					ClientConsole.receiveGUICommand(cmd);
+					return;
+		        }
 //				System.out.println("Mouse clicked on " + arrayList.get(uncheckedList.getSelectedIndex()));
 				creatorName.setText(arrayList.get(groceryList.getSelectedIndex()).getCreator());
 				checkerName.setText(arrayList.get(groceryList.getSelectedIndex()).getChecker());
@@ -117,7 +128,7 @@ public class ClientGUI  {
 		
 		input = new JTextField();
 		input.setBounds(12, 311, 282, 34);
-		frame.getContentPane().add(input);
+		frmMyGroceryList.getContentPane().add(input);
 		input.setColumns(10);
 
 		JButton btnAddEntry = new JButton("Add Entry");
@@ -147,18 +158,18 @@ public class ClientGUI  {
 			}
 		});
 		btnAddEntry.setBounds(321, 315, 117, 25);
-		frame.getContentPane().add(btnAddEntry);
+		frmMyGroceryList.getContentPane().add(btnAddEntry);
 
 		JLabel lblMyGroceryList = new JLabel("My Grocery List");
 		lblMyGroceryList.setBounds(165, 0, 129, 29);
-		frame.getContentPane().add(lblMyGroceryList);
+		frmMyGroceryList.getContentPane().add(lblMyGroceryList);
 		
 		JLabel lblCreator = new JLabel("Creator:");
 		lblCreator.setBounds(23, 246, 75, 25);
-		frame.getContentPane().add(lblCreator);
+		frmMyGroceryList.getContentPane().add(lblCreator);
 		
 		creatorName.setBounds(91, 246, 75, 25);
-		frame.getContentPane().add(creatorName);
+		frmMyGroceryList.getContentPane().add(creatorName);
 		
 		JButton btnRemoveEntry = new JButton("Remove Entry");
 		btnRemoveEntry.addActionListener(new ActionListener() {
@@ -181,14 +192,14 @@ public class ClientGUI  {
 		});
 		btnRemoveEntry.setBackground(new Color(255, 153, 102));
 		btnRemoveEntry.setBounds(308, 246, 130, 25);
-		frame.getContentPane().add(btnRemoveEntry);
+		frmMyGroceryList.getContentPane().add(btnRemoveEntry);
 		
 		JLabel lblChecker = new JLabel("Checked by:");
 		lblChecker.setBounds(12, 279, 86, 15);
-		frame.getContentPane().add(lblChecker);
+		frmMyGroceryList.getContentPane().add(lblChecker);
 		
 		checkerName.setBounds(121, 274, 75, 25);
-		frame.getContentPane().add(checkerName);
+		frmMyGroceryList.getContentPane().add(checkerName);
 	}
 
 	/**
