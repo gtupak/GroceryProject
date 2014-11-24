@@ -60,6 +60,22 @@ public class EchoServer extends AbstractServer
 	public EchoServer(int port) 
 	{
 		super(port);
+		// Set up properties file
+		Properties props = new Properties();
+		FileInputStream in = null;
+
+		try {
+			// Load properties and send it to getConnection()
+			in = new FileInputStream("database.properties");
+			props.load(in);
+			getConnection(props);
+
+
+		} catch (URISyntaxException | SQLException | IOException e) {
+			Logger lgr = Logger.getLogger(EchoServer.class.getName());
+			lgr.log(Level.WARNING, e.getMessage(), e);
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -110,7 +126,9 @@ public class EchoServer extends AbstractServer
 						// Initialize SQL statement
 						try {
 							ResultSet rs = null;
+							System.out.println();
 							System.out.println("---> SQL command to be executed: " + stm);
+							System.out.println();
 							PreparedStatement pst = database.prepareStatement(stm);
 							pst.executeUpdate();
 							
@@ -122,6 +140,7 @@ public class EchoServer extends AbstractServer
 								entries.add(new Entry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
 							}
 							this.sendToAllClients(entries);
+							return;
 							
 						} catch (SQLException e) {
 							Logger lgr = Logger.getLogger(EchoServer.class.getName());
@@ -145,7 +164,6 @@ public class EchoServer extends AbstractServer
 					this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
 				}
 			}
-
 		}
 		catch (Exception e){ // Occurs only if it's the first time that the clients connect
 			try {
@@ -156,7 +174,7 @@ public class EchoServer extends AbstractServer
 					
 					PreparedStatement pst = database.prepareStatement("SELECT * FROM entries");
 					ResultSet rs = pst.executeQuery();
-					
+									
 					ArrayList<Entry> entries = new ArrayList<Entry>();
 					while (rs.next()){
 						entries.add(new Entry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));

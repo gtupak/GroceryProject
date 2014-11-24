@@ -24,3 +24,4 @@ INSERT INTO usernames(id, username) VALUES (2, 'Christine');
 
 UPDATE entries SET checked=true WHERE id=1;
 DELETE FROM entries WHERE id=1;
+DELETE FROM entries;

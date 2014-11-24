@@ -165,13 +165,11 @@ public class ClientConsole implements ChatIF
 	 * @param args[0] The host to connect to.
 	 */
 	public static void main(String[] args) 
-	{
-//		JFrame parent = new JFrame();
-//		parent.setVisible(true);
-		
+	{		
+		// Prompts the user for name
 		String name = JOptionPane.showInputDialog(new JFrame(),"What is your name?", null);
-//		parent.setVisible(false);
 		
+		// Start the connection to server
 		startConnection(name, args);
 	}
 

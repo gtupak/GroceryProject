@@ -63,7 +63,7 @@ public class ClientGUI  {
 	}
 
 	/**
-	 * Create the application.
+	 * Create the GUI.
 	 */
 	public ClientGUI() {
 		initialize();
@@ -87,6 +87,8 @@ public class ClientGUI  {
 		CheckListManager checkListManager = new CheckListManager(groceryList){
 			@Override
 			public void mouseClicked(MouseEvent me){ 
+				
+				// Make checkboxes "checkable" on click
 				int index = groceryList.locationToIndex(me.getPoint()); 
 				if(index<0) 
 					return; 
@@ -108,6 +110,8 @@ public class ClientGUI  {
 		groceryList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				// If entry is double-clicked, an edit entry pop-up shows up
 				if(e.getClickCount() >= 2){
 					String updatedEntry = JOptionPane.showInputDialog(new JFrame(),"Edit entry", 
 							arrayList.get(groceryList.getSelectedIndex()).getDescription());
@@ -133,9 +137,11 @@ public class ClientGUI  {
 
 		JButton btnAddEntry = new JButton("Add Entry");
 		btnAddEntry.setBackground(new Color(204, 255, 153));
+		
 		// When Add Entry button is clicked: send #sql command with unique ID
 		btnAddEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 				// Clear the list first
 				listModel.clear();
 				
@@ -203,9 +209,8 @@ public class ClientGUI  {
 	}
 
 	/**
-	 * Updates the list with the table received from the database as a ResultSet
-	 * @param rs
-	 * @throws SQLException
+	 * Updates the list with the list of entries received from the database
+	 * @param list ArrayList<Entry> containing the updated entries from the server
 	 */
 	public static void receiveEntries(ArrayList<Entry> list){
 		listModel.clear();
