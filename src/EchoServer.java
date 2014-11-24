@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,14 +117,20 @@ public class EchoServer extends AbstractServer
 							pst = database.prepareStatement("SELECT * FROM entries");
 							rs = pst.executeQuery();
 							
-							while(rs.next()){
-								String toSend = "ID: " + rs.getInt(1) 
-										+ " Description :" + rs.getString(2)
-										+ " Creator: " + rs.getString(3)
-										+ " Checker: " + rs.getString(4)
-										+ " Checked: " +rs.getBoolean(5);
-								client.sendToClient(toSend);
+//							while(rs.next()){
+//								String toSend = "ID: " + rs.getInt(1) 
+//										+ " Description :" + rs.getString(2)
+//										+ " Creator: " + rs.getString(3)
+//										+ " Checker: " + rs.getString(4)
+//										+ " Checked: " +rs.getBoolean(5);
+//								client.sendToClient(toSend);
+//							}
+							ArrayList<Entry> entries = new ArrayList<Entry>();
+							while (rs.next()){
+								entries.add(new Entry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
 							}
+							client.sendToClient(entries);
+//							client.sendToClient(msg);
 							
 						} catch (SQLException e) {
 							Logger lgr = Logger.getLogger(EchoServer.class.getName());
@@ -155,6 +162,16 @@ public class EchoServer extends AbstractServer
 					System.out.println("Message received " + msg + " from " + client.getInetAddress());
 					client.setInfo("loginID", msg.toString().trim().substring(7, msg.toString().trim().length()));
 					client.setInfo("isLoggedIn", true);
+					
+					PreparedStatement pst = database.prepareStatement("SELECT * FROM entries");
+					ResultSet rs = pst.executeQuery();
+					
+					ArrayList<Entry> entries = new ArrayList<Entry>();
+					while (rs.next()){
+						entries.add(new Entry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getBoolean(5)));
+					}
+					client.sendToClient(entries);
+					
 					sendToAllClients(client.getInfo("loginID") + " has logged on.");
 					System.out.println(client.getInfo("loginID") + " has logged on.");
 					return;

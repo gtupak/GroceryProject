@@ -3,15 +3,18 @@
 // license found at www.lloseng.com 
 
 /**Assignment 3 - Lab 2
-*
-* Name: Gabriel Tapuc
-* Student #: 7269083
-* 
-* Name: Christine Kandalaft
-* Student #: 7216942
-*/
+ *
+ * Name: Gabriel Tapuc
+ * Student #: 7269083
+ * 
+ * Name: Christine Kandalaft
+ * Student #: 7216942
+ */
 
 import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import client.*;
 import common.*;
@@ -29,7 +32,7 @@ import common.*;
 public class ClientConsole implements ChatIF 
 {
 	//Class variables *************************************************
-	
+
 	/**
 	 * The default port to connect on.
 	 */
@@ -149,7 +152,7 @@ public class ClientConsole implements ChatIF
 	public static void receiveGUICommand(String cmd){
 		client.handleMessageFromClientUI(cmd);
 	}
-	
+
 	//Class methods ***************************************************
 
 	/**
@@ -157,7 +160,7 @@ public class ClientConsole implements ChatIF
 	 *
 	 * @param args[0] The host to connect to.
 	 */
- 	public static void main(String[] args) 
+	public static void main(String[] args) 
 	{
 		String host = "";
 		String login = "";
@@ -184,6 +187,13 @@ public class ClientConsole implements ChatIF
 		ClientConsole chat= new ClientConsole(host, port, login);
 		System.out.println("> Cannot open connection. Awaiting command.");
 		chat.accept();  //Wait for console data
+	}
+
+
+	@Override
+	public void displayGUI(ArrayList<Entry> msg) {
+		ClientGUI.receiveEntries(msg);
+		
 	}
 }
 //End of ConsoleChat class

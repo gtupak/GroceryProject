@@ -17,6 +17,8 @@ import ocsf.client.*;
 import common.*;
 
 import java.io.*;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 
 /**
  * This class overrides some of the methods defined in the abstract
@@ -69,6 +71,10 @@ public class ChatClient extends AbstractClient
 	 */
 	public void handleMessageFromServer(Object msg) 
 	{
+		if (msg instanceof ArrayList){
+			clientUI.displayGUI((ArrayList) msg);
+			return;
+		}
 		clientUI.display(msg.toString());
 	}
 

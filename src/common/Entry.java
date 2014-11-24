@@ -1,6 +1,8 @@
 package common;
 
-public class Entry {
+import java.io.Serializable;
+
+public class Entry implements Serializable {
 	private int id;
 	private String description;
 	private boolean checked = false;
@@ -11,6 +13,14 @@ public class Entry {
 		this.id = id;
 		this.creator = creator;
 		this.description = description;
+	}
+
+	public Entry(int int1, String string, String string2, String string3, boolean boolean1) {
+		id = int1;
+		description = string;
+		creator = string2;
+		checker = string3;
+		checked = boolean1;
 	}
 
 	public String getDescription() {

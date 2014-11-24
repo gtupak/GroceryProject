@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -28,9 +29,10 @@ public class ClientGUI  {
 	private JFrame frame;
 	private JTextField input;
 	private JList uncheckedList;
-	private ArrayList<Entry> arrayList = new ArrayList<Entry>();
-	private DefaultListModel listModel = new DefaultListModel();
-
+	private static ArrayList<Entry> arrayList = new ArrayList<Entry>();
+	private static DefaultListModel listModel = new DefaultListModel();
+	private static ArrayList<Integer> uniqueID = new ArrayList<Integer>();
+	
 	/**
 	 * Launch the application.
 	 */
@@ -83,15 +85,25 @@ public class ClientGUI  {
 		input.setColumns(10);
 
 		JButton btnAddEntry = new JButton("Add Entry");
+		
+		// When Add Entry button is clicked: send #sql command with unique ID
 		btnAddEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				// Clear the list first
 				listModel.clear();
-				//				arrayList.add(new Entry(arrayList.size() + 1, input.getText(), "Gabriel"));
-				//				for (int i = 0; i < arrayList.size(); i++){
-				//					listModel.add(i, arrayList.get(i).getDescription());
-				//				}
+
+				// Find uniqueID
+				int id = 0;
+					for (int i = 0; i < uniqueID.size(); i++){
+						if (id == uniqueID.get(i)){ // If id is found in the uniqueID list,
+							id++;					// Increment id
+							i = -1;					// Restart iterating
+						}
+					}
+					uniqueID.add(id); // Adds id to the index
+				
 				String cmd = "#sql INSERT INTO entries VALUES(" 
-						+ (arrayList.size() + 1) 
+						+ id 
 						+ ", '" + input.getText() + "'"
 						+ ", '" + ClientConsole.client.getLogin() + "'"
 						+ ", null, false)"; 
@@ -111,10 +123,17 @@ public class ClientGUI  {
 	 * @param rs
 	 * @throws SQLException
 	 */
-	public void receiveResultSet(ResultSet rs) throws SQLException{
+	public static void receiveEntries(ArrayList<Entry> list){
 		listModel.clear();
-		while (rs.next()){
-			arrayList.add(new Entry(rs.getInt(1), rs.getString(2), rs.getString(3)));
+		arrayList.clear();
+		uniqueID.clear();
+		Iterator<Entry> it = list.iterator();
+		uniqueID = new ArrayList<Integer>();
+		Entry en;
+		while (it.hasNext()){
+			en = it.next();
+			uniqueID.add(en.getId());
+			arrayList.add(en);
 		}
 		for (int i = 0; i<arrayList.size(); i++){
 			listModel.add(i, arrayList.get(i).getDescription());

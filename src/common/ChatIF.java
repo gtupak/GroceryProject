@@ -3,7 +3,7 @@
 // license found at www.lloseng.com 
 
 package common;
-
+import java.util.ArrayList;
 /**
  * This interface implements the abstract method used to display
  * objects onto the client or server UIs.
@@ -19,4 +19,10 @@ public interface ChatIF
    * a UI.
    */
   public abstract void display(String message);
+  
+  /**
+   * Method that receives an ArrayList of entries to display on the client GUI
+   * @param msg
+   */
+  public abstract void displayGUI(ArrayList<Entry> msg);
 }
