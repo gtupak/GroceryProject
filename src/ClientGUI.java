@@ -33,9 +33,9 @@ import javax.swing.ListModel;
 
 public class ClientGUI  {
 
-	private JFrame frame;
+	protected JFrame frame;
 	private JTextField input;
-	private static JList uncheckedList;
+	private static JList groceryList;
 	private static ArrayList<Entry> arrayList = new ArrayList<Entry>();
 	private static DefaultListModel listModel = new DefaultListModel();
 	private static ArrayList<Integer> uniqueID = new ArrayList<Integer>();
@@ -47,7 +47,7 @@ public class ClientGUI  {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -80,38 +80,38 @@ public class ClientGUI  {
 		scrollPane.setBounds(12, 41, 426, 193);
 		frame.getContentPane().add(scrollPane);
 
-		uncheckedList = new JList(listModel);
-		CheckListManager checkListManager = new CheckListManager(uncheckedList){
+		groceryList = new JList(listModel);
+		CheckListManager checkListManager = new CheckListManager(groceryList){
 			@Override
 			public void mouseClicked(MouseEvent me){ 
-				int index = uncheckedList.locationToIndex(me.getPoint()); 
+				int index = groceryList.locationToIndex(me.getPoint()); 
 				if(index<0) 
 					return; 
-				if(me.getX()>uncheckedList.getCellBounds(index, index).x+hotspot) 
+				if(me.getX()>groceryList.getCellBounds(index, index).x+hotspot) 
 					return; 
 				toggleSelection(index);
 				
 				// Update entry as "checked" in the database
-				Entry en = arrayList.get(uncheckedList.getSelectedIndex());
+				Entry en = arrayList.get(groceryList.getSelectedIndex());
 				int id = en.getId();
-				String checker = (!en.isChecked()) ? ClientConsole.client.getLogin() : "";
+				String checker = (en.isChecked()) ? "" : ClientConsole.client.getLogin();
 				String cmd = "#sql UPDATE entries SET checked=" + !en.isChecked() + ", checker='"
 						+ checker + "' WHERE id=" + id;
 				ClientConsole.receiveGUICommand(cmd);
 			} 
 		};
 		
-		uncheckedList.setBackground(new Color(255, 255, 204));
-		uncheckedList.addMouseListener(new MouseAdapter() {
+		groceryList.setBackground(new Color(255, 255, 204));
+		groceryList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				System.out.println("Mouse clicked on " + arrayList.get(uncheckedList.getSelectedIndex()));
-				creatorName.setText(arrayList.get(uncheckedList.getSelectedIndex()).getCreator());
-				checkerName.setText(arrayList.get(uncheckedList.getSelectedIndex()).getChecker());
+//				System.out.println("Mouse clicked on " + arrayList.get(uncheckedList.getSelectedIndex()));
+				creatorName.setText(arrayList.get(groceryList.getSelectedIndex()).getCreator());
+				checkerName.setText(arrayList.get(groceryList.getSelectedIndex()).getChecker());
 			}
 		});
 		
-		scrollPane.setViewportView(uncheckedList);
+		scrollPane.setViewportView(groceryList);
 		
 		selModel = checkListManager.getSelectionModel();
 		
@@ -164,7 +164,7 @@ public class ClientGUI  {
 		btnRemoveEntry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {				
 				// Get clicked ID
-				int id = arrayList.get(uncheckedList.getSelectedIndex()).getId();
+				int id = arrayList.get(groceryList.getSelectedIndex()).getId();
 				
 				// Create SQL string
 				String cmd = "#SQL DELETE FROM entries WHERE id=" + id;
@@ -215,6 +215,8 @@ public class ClientGUI  {
 			if (arrayList.get(ind).isChecked()){
 				selModel.addSelectionInterval(ind, ind);
 			}
+			else
+				selModel.removeSelectionInterval(ind, ind);
 		}
 	}
 }

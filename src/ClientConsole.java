@@ -16,6 +16,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import client.*;
 import common.*;
 
@@ -162,38 +166,56 @@ public class ClientConsole implements ChatIF
 	 */
 	public static void main(String[] args) 
 	{
+//		JFrame parent = new JFrame();
+//		parent.setVisible(true);
+		
+		String name = JOptionPane.showInputDialog(new JFrame(),"What is your name?", null);
+//		parent.setVisible(false);
+		
+		startConnection(name, args);
+	}
+
+	/**
+	 *  Called after prompt button has been clicked
+	 * @param name
+	 * @param args
+	 */
+	protected static void startConnection(String name, String[] args) {
 		String host = "";
-		String login = "";
+		String login = name;
 		// **** Changed for E49
 		int port = DEFAULT_PORT;  //The port number
 
 		try
 		{
-			login = args[0];
-			host = args[1];
-			port = Integer.parseInt(args[2]);
+			host = args[0];
+			port = Integer.parseInt(args[1]);
 		}
 		catch(ArrayIndexOutOfBoundsException e)
 		{
 			if (e.getLocalizedMessage().equals("0")){
-				System.out.println("ERROR - No login ID specified Connection aborted.");
-				return;
-			}
-			else if (e.getLocalizedMessage().equals("1")){
 				host = "localhost";
 			}
 		}
-		ClientGUI.main(args);
 		ClientConsole chat= new ClientConsole(host, port, login);
-		System.out.println("> Cannot open connection. Awaiting command.");
+		try {
+			client.openConnection();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		client.handleMessageFromClientUI("#login " + client.getLogin());
+		ClientGUI.main(args); // Start GUI
 		chat.accept();  //Wait for console data
 	}
 
-
+	/**
+	 * Method that receives an ArrayList of entries to display on the client GUI
+	 * @param msg
+	 */
 	@Override
 	public void displayGUI(ArrayList<Entry> msg) {
 		ClientGUI.receiveEntries(msg);
-		
 	}
 }
 //End of ConsoleChat class
