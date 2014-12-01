@@ -13,6 +13,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+//@author Santhosh Kumar T - santhosh@in.fiorano.com
+
 public class CheckListManager extends MouseAdapter implements ListSelectionListener, ActionListener{ 
 	private ListSelectionModel selectionModel = new DefaultListSelectionModel(); 
 	private JList list = new JList(); 
