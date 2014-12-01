@@ -1,59 +1,75 @@
 Server listening for connections on port 5555
 A new client is attempting to connect to the server.
-
 Message received #login testCase from /127.0.0.1
-
-
-
+First, emptying database contents.
 testCase has logged on.
+
+---> SQL command to be executed: DELETE FROM entries;
+
+
+Current entries in database: 
+ID: 1; Description: Item list 1 --#-- EDITED; Creator: testCase; Is Checked: false; Checker: null
+ID: 2; Description: Item list 2; Creator: testCase; Is Checked: false; Checker: null
+
+Current entries in database: 
+
+---TEST 1: Adding entires---
 
 ---> SQL command to be executed: INSERT INTO entries VALUES(0, 'Item list 0', 'testCase', null, false)
 
 
 Current entries in database: 
+ID: 0; Description: Item list 0; Creator: testCase; Is Checked: false; Checker: null
 
-
-Current entries in database: 
 ---> SQL command to be executed: INSERT INTO entries VALUES(1, 'Item list 1', 'testCase', null, false)
 
-ID: 0; Description: Item list 0; Creator: testCase; Is Checked: false; Checker: null
-
 
 Current entries in database: 
+ID: 0; Description: Item list 0; Creator: testCase; Is Checked: false; Checker: null
+ID: 1; Description: Item list 1; Creator: testCase; Is Checked: false; Checker: null
+
 ---> SQL command to be executed: INSERT INTO entries VALUES(2, 'Item list 2', 'testCase', null, false)
 
-ID: 0; Description: Item list 0; Creator: testCase; Is Checked: false; Checker: null
-ID: 1; Description: Item list 1; Creator: testCase; Is Checked: false; Checker: null
-
 
 Current entries in database: 
+ID: 0; Description: Item list 0; Creator: testCase; Is Checked: false; Checker: null
+ID: 1; Description: Item list 1; Creator: testCase; Is Checked: false; Checker: null
+ID: 2; Description: Item list 2; Creator: testCase; Is Checked: false; Checker: null
+
+---TEST 2: Deleting entry with ID 0---
+
 ---> SQL command to be executed: DELETE FROM entries WHERE id=0
 
-ID: 0; Description: Item list 0; Creator: testCase; Is Checked: false; Checker: null
+
+Current entries in database: 
 ID: 1; Description: Item list 1; Creator: testCase; Is Checked: false; Checker: null
 ID: 2; Description: Item list 2; Creator: testCase; Is Checked: false; Checker: null
 
+---TEST 3: Editing entry with ID 1---
 
-Current entries in database: 
 ---> SQL command to be executed: UPDATE entries SET entry='Item list 1 --#-- EDITED' WHERE id=1
 
-ID: 1; Description: Item list 1; Creator: testCase; Is Checked: false; Checker: null
-ID: 2; Description: Item list 2; Creator: testCase; Is Checked: false; Checker: null
-
 
 Current entries in database: 
----> SQL command to be executed: UPDATE entries SET checked=TRUE, checker='testCase' WHERE id=2
-
 ID: 2; Description: Item list 2; Creator: testCase; Is Checked: false; Checker: null
 ID: 1; Description: Item list 1 --#-- EDITED; Creator: testCase; Is Checked: false; Checker: null
 
----> SQL command to be executed: UPDATE entries SET checked=FALSE, checker=null WHERE id=2
+---TEST 4: Checking entry with ID 2---
+
+---> SQL command to be executed: UPDATE entries SET checked=TRUE, checker='testCase' WHERE id=2
 
 
 Current entries in database: 
 ID: 1; Description: Item list 1 --#-- EDITED; Creator: testCase; Is Checked: false; Checker: null
 ID: 2; Description: Item list 2; Creator: testCase; Is Checked: true; Checker: testCase
 
+---TEST 5: Unchecking entry with ID 2---
+
+---> SQL command to be executed: UPDATE entries SET checked=FALSE, checker=null WHERE id=2
+
+
 Current entries in database: 
 ID: 1; Description: Item list 1 --#-- EDITED; Creator: testCase; Is Checked: false; Checker: null
 ID: 2; Description: Item list 2; Creator: testCase; Is Checked: false; Checker: null
+Server has stopped listening for connections.
+TEST CASE COMPLETED SUCESSFULLY.
