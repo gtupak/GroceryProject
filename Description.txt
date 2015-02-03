@@ -16,6 +16,4 @@ Description:
 7. Test in command line #
 8. Make GUI #
 
-Umple code: https://docs.google.com/document/d/1gvPXB5T7gL_4ZkLZ5LrRn3PvBTJw5I0h1bCUbGEmZd4/edit?usp=sharing
-
-By Gabriel Tapuc and Christine Kandalaft
+By Gabriel T and Christine K
